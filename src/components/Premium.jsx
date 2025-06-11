@@ -1,7 +1,23 @@
 import axios from "axios";
 import { Baseurl } from "../utils/constants";
+import { useEffect } from "react";
 
 const Premium = () => {
+const [isPremium,setIsPremium] = useState(false)
+
+useEffect(()=>{
+  verifyPremiumUser()
+},[])
+const verifyPremiumUser = async() => {
+  const res = await axios.get(Baseurl + "/payment/verify",{
+    withCredentials:true
+  });
+
+  if(res.data.premium){
+    setIsPremium(true)
+  }
+}
+
   const handleBuyPremium = async (type) => {
     try {
       const orders = await axios.post(
@@ -23,6 +39,7 @@ const Premium = () => {
             email: orders.data.notes.emailID,
             contact: "9999999999"
         },
+        handler:verifyPremiumUser,
         theme: {
             color: "#3399cc"
         }
@@ -33,8 +50,9 @@ const Premium = () => {
       console.log(error);
     }
   };
-
-  return (
+  return isPremium ? (
+    <h1>Already premium</h1>
+  ) : (
     <div className="m-10">
       <div className="flex w-full">
         <div className="card bg-base-300 rounded-box grid h-80 grow place-items-center">
@@ -65,6 +83,7 @@ const Premium = () => {
       </div>
     </div>
   );
+  
 };
 
 export default Premium;
